@@ -1,0 +1,630 @@
+/* =========================================================================
+   LA RESERVA — Sistema de gestión para licorería de barrio
+   Paleta inspirada en la vitrina de una licorería al anochecer:
+   madera oscura, vidrio ámbar, sellos de garantía, papel cálido.
+
+   NOTA DE MIGRACIÓN: este archivo es el CSS original del sistema, migrado
+   tal cual (sin cambios de estilos, colores, tamaños ni animaciones) para
+   garantizar el 100% de fidelidad visual. Tailwind está instalado y
+   configurado (ver tailwind.config.js) y se usa para utilidades puntuales
+   en el código nuevo, pero el diseño detallado (gradientes, keyframes,
+   sombras compuestas) se conserva aquí como CSS modular, tal como permite
+   la regla de prioridad: "si Tailwind provoca diferencias visuales,
+   conservar CSS modular".
+   ========================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Nunito:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  /* ---- Color: la vitrina al anochecer ---- */
+  --fondo:            #FBF3E7;   /* papel cálido */
+  --fondo-panel:       #FFFDF9;  /* blanco tibio para tarjetas */
+  --madera:            #3D2817;  /* madera oscura — estructura, texto fuerte */
+  --madera-suave:      #6B4A34;  /* madera media — texto secundario */
+  --ambar:             #C97B2E;  /* vidrio de whisky — acción primaria */
+  --ambar-fuerte:      #A8621F;
+  --ambar-suave:       #F0D9B5;  /* halo ámbar */
+  --dorado:            #E8B24D;  /* reflejo dorado — destacados */
+  --verde-botella:     #2F5233;  /* vidrio de botella — éxito, ganancia */
+  --verde-suave:       #DCE8DD;
+  --vino:              #7A2E2E;  /* vino tinto — alertas, cuidado */
+  --vino-suave:        #F1DCDC;
+  --linea:             #E7D9C4;  /* separadores color madera clara */
+  --sombra: 0 10px 30px -12px rgba(61, 40, 23, 0.28);
+  --sombra-suave: 0 4px 14px -6px rgba(61, 40, 23, 0.18);
+
+  --fuente-display: 'Fraunces', Georgia, serif;
+  --fuente-cuerpo: 'Nunito', system-ui, -apple-system, sans-serif;
+  --fuente-datos: 'DM Mono', 'Courier New', monospace;
+
+  --radio: 16px;
+  --radio-chico: 10px;
+  --veloz: 180ms cubic-bezier(.4,0,.2,1);
+  --medio: 320ms cubic-bezier(.16,1,.3,1);
+}
+
+*{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+
+/* Íconos SVG de línea (reemplazan los emojis) */
+.icono-svg{ display:block; flex-shrink:0; }
+[data-icono]{ display:inline-flex; align-items:center; justify-content:center; line-height:0; }
+
+/* Regla de seguridad: el atributo hidden SIEMPRE debe ocultar el elemento,
+   sin importar qué display defina su clase (evita que .modal-fondo, con
+   display:flex, se muestre vacío por encima del resto de la interfaz). */
+[hidden]{ display: none !important; }
+
+body{
+  margin:0;
+  font-family: var(--fuente-cuerpo);
+  background: var(--fondo);
+  color: var(--madera);
+  -webkit-font-smoothing: antialiased;
+}
+h1,h2,h3,h4{ font-family: var(--fuente-display); margin:0; color: var(--madera); }
+p{ margin:0; }
+button{ font-family: inherit; cursor:pointer; }
+input, select{ font-family: inherit; }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+:focus-visible{
+  outline: 3px solid var(--dorado);
+  outline-offset: 2px;
+}
+
+/* =========================================================================
+   PANTALLA DE LOGIN — la puerta cálida de la tienda
+   ========================================================================= */
+.pantalla-login{
+  min-height: 100vh;
+  display:flex; align-items:center; justify-content:center;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 20% 20%, #4a3220 0%, #2a1a10 55%, #1c1109 100%);
+}
+
+.login-atmosfera{ position:absolute; inset:0; }
+.botella{
+  position:absolute; bottom:-40px;
+  width: 90px; height: 260px;
+  border-radius: 45px 45px 14px 14px;
+  opacity: 0.16;
+  animation: flotar 9s ease-in-out infinite;
+}
+.b1{ left:8%; background: var(--ambar); animation-delay: 0s; }
+.b2{ left:80%; width:70px; height:210px; background: var(--verde-botella); animation-delay: 1.4s; }
+.b3{ left:45%; width:60px; height:180px; background: var(--vino); opacity:.12; animation-delay: .7s; }
+@keyframes flotar{
+  0%,100%{ transform: translateY(0) rotate(-1deg); }
+  50%{ transform: translateY(-22px) rotate(1deg); }
+}
+.brillo{
+  position:absolute; border-radius:50%;
+  filter: blur(60px);
+  background: var(--dorado);
+  opacity: .18;
+}
+.brillo1{ width:340px; height:340px; top:-80px; right:-60px; }
+.brillo2{ width:260px; height:260px; bottom:-60px; left:-40px; background: var(--ambar); opacity:.14; }
+
+.login-tarjeta{
+  position:relative; z-index:2;
+  width: min(420px, 90vw);
+  background: var(--fondo-panel);
+  border-radius: 24px;
+  padding: 44px 38px 34px;
+  box-shadow: 0 30px 70px -20px rgba(0,0,0,0.55);
+  animation: aparecerLogin var(--medio) both;
+}
+@keyframes aparecerLogin{
+  from{ opacity:0; transform: translateY(24px) scale(.97); }
+  to{ opacity:1; transform: translateY(0) scale(1); }
+}
+
+.login-marca{ text-align:center; margin-bottom: 28px; }
+.login-icono{
+  width:74px; height:74px; margin:0 auto 14px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:50%;
+  background: linear-gradient(145deg, var(--ambar-suave), #fff);
+  color: var(--ambar-fuerte);
+  box-shadow: var(--sombra-suave);
+}
+.login-marca h1{ font-size: 1.9rem; letter-spacing: .01em; }
+.login-lema{
+  margin-top:6px; color: var(--madera-suave); font-size:.98rem; font-weight:600;
+}
+
+.login-form{ display:flex; flex-direction:column; gap:16px; }
+.campo{ display:flex; flex-direction:column; gap:6px; }
+.campo span{ font-weight:700; font-size:.88rem; color: var(--madera-suave); }
+.campo input, .campo select{
+  border: 2px solid var(--linea);
+  background: #fff;
+  border-radius: var(--radio-chico);
+  padding: 13px 14px;
+  font-size: 1rem;
+  color: var(--madera);
+  transition: border-color var(--veloz), box-shadow var(--veloz);
+}
+.campo input:focus, .campo select:focus{
+  border-color: var(--ambar);
+  box-shadow: 0 0 0 4px var(--ambar-suave);
+  outline:none;
+}
+.campo-password{ position:relative; display:flex; }
+.campo-password input{ flex:1; }
+.btn-ojo{
+  position:absolute; right:10px; top:50%; transform:translateY(-50%);
+  background:none; border:none; font-size:1.1rem; opacity:.6;
+}
+.btn-ojo:hover{ opacity:1; }
+
+.login-error{
+  color: var(--vino); font-weight:700; font-size:.9rem; min-height: 1.1em;
+  animation: none;
+}
+.login-error.visible{ animation: sacudir .35s; }
+@keyframes sacudir{
+  0%,100%{ transform: translateX(0); }
+  25%{ transform: translateX(-6px); }
+  75%{ transform: translateX(6px); }
+}
+
+.login-ayuda{ text-align:center; font-size:.8rem; color: var(--madera-suave); margin-top:4px; }
+
+/* Botones */
+.btn{
+  border:none; border-radius: 999px;
+  padding: 13px 22px;
+  font-weight: 800; font-size: .98rem;
+  transition: transform var(--veloz), box-shadow var(--veloz), background var(--veloz);
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+}
+.btn:active{ transform: scale(.97); }
+.btn-primario{
+  background: linear-gradient(160deg, var(--ambar), var(--ambar-fuerte));
+  color:#fff;
+  box-shadow: 0 10px 22px -10px rgba(169,98,31,.65);
+}
+.btn-primario:hover{ box-shadow: 0 14px 26px -8px rgba(169,98,31,.75); transform: translateY(-1px); }
+.btn-secundario{
+  background: var(--fondo-panel);
+  color: var(--madera);
+  border: 2px solid var(--linea);
+}
+.btn-secundario:hover{ border-color: var(--ambar); color: var(--ambar-fuerte); }
+.btn-ancho{ width:100%; }
+.btn-peligro{ background: var(--vino); color:#fff; }
+
+/* =========================================================================
+   SELLO DE CONFIRMACIÓN — el elemento firma de la experiencia
+   ========================================================================= */
+.sello-overlay{
+  position: fixed; inset:0; z-index: 999;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(43, 29, 18, 0);
+  pointer-events:none;
+  transition: background var(--medio);
+}
+.sello-overlay.mostrar{ background: rgba(43, 29, 18, .18); pointer-events:all; }
+.sello{
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  transform: scale(0.3) rotate(-18deg);
+  opacity:0;
+}
+.sello-overlay.mostrar .sello{
+  animation: golpeSello .55s cubic-bezier(.2,1.4,.4,1) forwards;
+}
+@keyframes golpeSello{
+  0%{ transform: scale(0.2) rotate(-24deg); opacity:0; }
+  55%{ transform: scale(1.12) rotate(4deg); opacity:1; }
+  75%{ transform: scale(0.96) rotate(-2deg); }
+  100%{ transform: scale(1) rotate(0deg); opacity:1; }
+}
+.sello svg{ filter: drop-shadow(0 8px 18px rgba(47,82,51,.45)); }
+.sello-anillo-ext{ fill:none; stroke: var(--verde-botella); stroke-width:5; }
+.sello-anillo-int{ fill: rgba(47,82,51,.08); stroke: var(--verde-botella); stroke-width:2; stroke-dasharray:4 4; }
+.sello-check{ stroke: var(--verde-botella); stroke-dasharray: 70; stroke-dashoffset:70; }
+.sello-overlay.mostrar .sello-check{ animation: trazarCheck .4s .3s ease forwards; }
+@keyframes trazarCheck{ to{ stroke-dashoffset:0; } }
+.sello-texto{
+  background: var(--verde-botella); color:#fff; font-weight:800;
+  padding: 6px 18px; border-radius:999px; font-size:.95rem;
+  box-shadow: var(--sombra-suave);
+}
+
+/* Toasts */
+.toast-pila{
+  position: fixed; top:20px; right:20px; z-index: 1200;
+  display:flex; flex-direction:column; gap:10px;
+}
+.toast{
+  background: var(--madera); color:#fff;
+  padding: 13px 18px; border-radius: 12px;
+  font-weight:700; font-size:.92rem;
+  box-shadow: var(--sombra);
+  display:flex; align-items:center; gap:10px;
+  animation: entrarToast var(--medio) both;
+  max-width: 320px;
+}
+.toast.exito{ background: var(--verde-botella); }
+.toast.error{ background: var(--vino); }
+.toast.saliendo{ animation: salirToast .3s forwards; }
+@keyframes entrarToast{ from{ opacity:0; transform: translateX(40px); } to{ opacity:1; transform:translateX(0); } }
+@keyframes salirToast{ to{ opacity:0; transform: translateX(40px); } }
+
+/* =========================================================================
+   ESTRUCTURA DE LA APP
+   ========================================================================= */
+.app{ display:flex; min-height:100vh; }
+
+.barra-lateral{
+  width: 232px; flex-shrink:0;
+  background: var(--madera);
+  color: #F3E6D6;
+  display:flex; flex-direction:column;
+  padding: 22px 14px;
+  position: sticky; top:0; height:100vh;
+  transition: transform var(--medio);
+}
+.marca-mini{
+  display:flex; align-items:center; gap:10px;
+  padding: 6px 10px 24px;
+  font-family: var(--fuente-display); font-size:1.2rem; font-weight:700;
+  color: var(--dorado);
+}
+.marca-icono{ color: var(--dorado); }
+
+.nav-principal{ display:flex; flex-direction:column; gap:4px; flex:1; }
+.nav-item{
+  display:flex; align-items:center; gap:12px;
+  background:none; border:none; color: #E9D9C3;
+  padding: 12px 14px; border-radius: var(--radio-chico);
+  font-weight:700; font-size:.96rem; text-align:left;
+  transition: background var(--veloz), color var(--veloz), transform var(--veloz);
+}
+.nav-item:hover{ background: rgba(255,255,255,.08); }
+.nav-item.activo{
+  background: linear-gradient(90deg, var(--ambar), transparent 130%);
+  color:#fff;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+}
+.nav-ico{ width:22px; flex-shrink:0; }
+
+.btn-salir{
+  display:flex; align-items:center; gap:12px;
+  background:none; border:1px solid rgba(255,255,255,.15); color:#E9D9C3;
+  padding: 12px 14px; border-radius: var(--radio-chico); font-weight:700;
+  margin-top:10px;
+  transition: background var(--veloz), border-color var(--veloz);
+}
+.btn-salir:hover{ background: rgba(122,46,46,.35); border-color: var(--vino); }
+
+.contenido{ flex:1; padding: 26px 34px 60px; max-width: 1200px; }
+
+.encabezado{
+  display:flex; align-items:center; gap:16px; margin-bottom: 22px;
+}
+.btn-menu-movil{
+  display:none; background:none; border:none; font-size:1.5rem; color: var(--madera);
+}
+.encabezado-titulo{ flex:1; }
+.encabezado-titulo h2{ font-size:1.7rem; }
+.encabezado-titulo p{ color: var(--madera-suave); font-weight:600; margin-top:2px; }
+.encabezado-usuario{ display:flex; align-items:center; gap:16px; }
+.reloj{ font-family: var(--fuente-datos); color: var(--madera-suave); font-size:.9rem; }
+.chip-usuario{
+  display:flex; align-items:center; gap:8px;
+  background: var(--fondo-panel); border:1px solid var(--linea);
+  padding: 6px 14px 6px 6px; border-radius:999px; font-weight:700; font-size:.9rem;
+}
+.avatar{
+  width:32px; height:32px; border-radius:50%;
+  background: linear-gradient(160deg, var(--ambar), var(--ambar-fuerte));
+  color:#fff; display:flex; align-items:center; justify-content:center;
+  font-size:.78rem; font-weight:800;
+}
+
+/* Vistas */
+.vista{ display:none; animation: entrarVista var(--medio) both; }
+.vista.activa{ display:block; }
+@keyframes entrarVista{
+  from{ opacity:0; transform: translateY(10px); }
+  to{ opacity:1; transform: translateY(0); }
+}
+
+/* Saludo */
+.saludo-tarjeta{
+  background: linear-gradient(120deg, var(--madera) 0%, #55381F 100%);
+  color:#fff;
+  border-radius: var(--radio);
+  padding: 26px 30px;
+  display:flex; align-items:center; justify-content:space-between;
+  box-shadow: var(--sombra);
+  margin-bottom: 22px;
+  position: relative; overflow:hidden;
+}
+.saludo-tarjeta::after{
+  content:""; position:absolute; right:-40px; top:-40px; width:180px; height:180px;
+  background: radial-gradient(circle, rgba(232,178,77,.35), transparent 70%);
+}
+.saludo-eyebrow{ color: var(--dorado); font-weight:800; letter-spacing:.04em; text-transform:uppercase; font-size:.78rem; }
+.saludo-tarjeta h3{ color:#fff; font-size:1.5rem; margin-top:6px; }
+.saludo-sub{ color:#E9D9C3; margin-top:6px; font-weight:600; }
+.saludo-sello{
+  width:64px; height:64px; border-radius:50%;
+  background: rgba(232,178,77,.16); color: var(--dorado);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+
+/* KPIs */
+.tarjetas-kpi{
+  display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; margin-bottom:22px;
+}
+.kpi{
+  background: var(--fondo-panel); border-radius: var(--radio);
+  padding: 18px 20px; display:flex; align-items:center; gap:14px;
+  box-shadow: var(--sombra-suave);
+  border-left: 5px solid transparent;
+  transition: transform var(--veloz);
+}
+.kpi:hover{ transform: translateY(-3px); }
+.kpi-icono-badge{
+  width:46px; height:46px; border-radius:14px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+}
+.kpi-label{ color: var(--madera-suave); font-weight:700; font-size:.82rem; }
+.kpi-valor{ font-family: var(--fuente-datos); font-size:1.4rem; font-weight:700; color: var(--madera); }
+.kpi-ambar{ border-color: var(--ambar); }
+.kpi-ambar .kpi-icono-badge{ background: var(--ambar-suave); color: var(--ambar-fuerte); }
+.kpi-verde{ border-color: var(--verde-botella); }
+.kpi-verde .kpi-icono-badge{ background: var(--verde-suave); color: var(--verde-botella); }
+.kpi-vino{ border-color: var(--vino); }
+.kpi-vino .kpi-icono-badge{ background: var(--vino-suave); color: var(--vino); }
+.kpi-madera{ border-color: var(--madera-suave); }
+.kpi-madera .kpi-icono-badge{ background: #EEE6DA; color: var(--madera-suave); }
+
+/* Aviso informativo (aclara diferencias entre pantallas parecidas) */
+.aviso-info{
+  display:flex; align-items:flex-start; gap:12px;
+  background: #FBF3E7; border: 1px solid var(--linea); border-left: 4px solid var(--ambar);
+  border-radius: var(--radio-chico); padding: 12px 16px; margin-bottom:18px;
+}
+.aviso-info span[data-icono]{ color: var(--ambar-fuerte); margin-top:2px; flex-shrink:0; }
+.aviso-info p{ color: var(--madera-suave); font-size:.9rem; line-height:1.5; }
+.aviso-info strong{ color: var(--madera); }
+
+/* Paneles */
+.panel{
+  background: var(--fondo-panel); border-radius: var(--radio);
+  padding: 22px; box-shadow: var(--sombra-suave); margin-bottom:20px;
+}
+.panel-angosto{ max-width: 520px; }
+.panel-encabezado{
+  display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px; flex-wrap:wrap;
+}
+.panel-encabezado h4{ font-size:1.15rem; }
+.etiqueta-suave{
+  background: var(--ambar-suave); color: var(--ambar-fuerte);
+  font-weight:800; font-size:.76rem; padding:5px 12px; border-radius:999px;
+}
+.link-accion{
+  background:none; border:none; color: var(--ambar-fuerte); font-weight:800; font-size:.88rem;
+  display:inline-flex; align-items:center; gap:6px;
+}
+.link-accion:hover{ text-decoration:underline; }
+
+.fila-dos-columnas{ display:grid; grid-template-columns: 1.1fr 1fr; gap:20px; margin-bottom:22px; }
+
+.lista-alertas{ display:flex; flex-direction:column; gap:10px; max-height:280px; overflow:auto; }
+.alerta-item{
+  display:flex; align-items:center; justify-content:space-between;
+  background: var(--vino-suave); border-radius: var(--radio-chico);
+  padding: 12px 14px; font-weight:700; font-size:.9rem; color: var(--vino);
+  animation: latido 2.4s ease-in-out infinite;
+}
+@keyframes latido{ 0%,100%{ box-shadow:0 0 0 0 rgba(122,46,46,0);} 50%{ box-shadow:0 0 0 6px rgba(122,46,46,.06);} }
+.alerta-item span.stock{ background:#fff; padding:2px 10px; border-radius:999px; font-family: var(--fuente-datos); }
+.sin-alertas{ color: var(--verde-botella); font-weight:700; padding: 20px 6px; text-align:center; }
+
+.lista-ultimas-ventas{ display:flex; flex-direction:column; gap:10px; max-height:280px; overflow:auto; }
+.venta-item{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 10px 4px; border-bottom:1px solid var(--linea);
+}
+.venta-item:last-child{ border-bottom:none; }
+.venta-hora{ color: var(--madera-suave); font-size:.82rem; font-family: var(--fuente-datos); }
+.venta-monto{ font-family: var(--fuente-datos); font-weight:700; color: var(--verde-botella); }
+
+.accesos-rapidos{ display:flex; gap:14px; flex-wrap:wrap; }
+.acceso-rapido{
+  flex:1; min-width:180px;
+  background: var(--fondo-panel); border: 2px dashed var(--linea);
+  border-radius: var(--radio); padding: 18px; font-weight:800; color: var(--madera);
+  display:flex; flex-direction:column; align-items:center; gap:8px; font-size:1rem;
+  transition: border-color var(--veloz), transform var(--veloz), background var(--veloz);
+}
+.acceso-rapido span[data-icono]{ color: var(--ambar-fuerte); }
+.acceso-rapido:hover{ border-color: var(--ambar); border-style:solid; transform: translateY(-2px); background:#FFF9EF; }
+
+/* Tablas */
+.tabla-envoltorio{ overflow-x:auto; }
+.tabla{ width:100%; border-collapse: collapse; font-size:.92rem; }
+.tabla th{
+  text-align:left; padding: 10px 12px; color: var(--madera-suave);
+  font-size:.78rem; text-transform:uppercase; letter-spacing:.04em;
+  border-bottom: 2px solid var(--linea);
+}
+.tabla td{ padding: 12px; border-bottom: 1px solid var(--linea); vertical-align:middle; }
+.tabla tbody tr{ transition: background var(--veloz); }
+.tabla tbody tr:hover{ background: #FBF3E7; }
+.tabla .num{ font-family: var(--fuente-datos); }
+
+.badge{ padding:4px 10px; border-radius:999px; font-weight:800; font-size:.76rem; }
+.badge-ok{ background: var(--verde-suave); color: var(--verde-botella); }
+.badge-bajo{ background: var(--vino-suave); color: var(--vino); }
+.badge-inactivo{ background:#EEE6DA; color: var(--madera-suave); }
+
+.icono-accion{
+  background:none; border:none; font-size:1rem; padding:6px; border-radius:8px;
+  transition: background var(--veloz), transform var(--veloz);
+}
+.icono-accion:hover{ background: var(--ambar-suave); transform: scale(1.1); }
+
+/* Filtros */
+.filtros-fila{ display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+.filtros-fila input, .filtros-fila select{
+  border: 2px solid var(--linea); border-radius: var(--radio-chico);
+  padding: 10px 14px; font-size:.92rem; background:#fff; color: var(--madera);
+}
+.filtros-fila input[type="text"]{ flex:1; min-width:200px; }
+
+/* Punto de venta (POS) */
+.pos-layout{ display:grid; grid-template-columns: 1fr 1.3fr; gap:20px; align-items:start; }
+.buscador-caja{ position:relative; margin-bottom:12px; }
+.buscador-caja input{
+  width:100%; padding: 13px 40px 13px 14px; border:2px solid var(--linea); border-radius: var(--radio-chico);
+  font-size:1rem;
+}
+.buscador-caja input:focus{ border-color: var(--ambar); outline:none; box-shadow:0 0 0 4px var(--ambar-suave); }
+.buscador-ico{ position:absolute; right:14px; top:50%; transform:translateY(-50%); opacity:.5; }
+.resultados-busqueda{
+  max-height: 220px; overflow:auto; display:flex; flex-direction:column; gap:6px; margin-bottom:10px;
+}
+.resultado-item{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 10px 12px; border-radius: var(--radio-chico); border:1px solid var(--linea);
+  background:#fff; transition: border-color var(--veloz), transform var(--veloz);
+}
+.resultado-item:hover{ border-color: var(--ambar); transform: translateX(2px); }
+.resultado-item button{ background: var(--verde-botella); color:#fff; border:none; border-radius:8px; padding:6px 12px; font-weight:800; }
+.resultado-agotado{ opacity:.5; }
+
+.carrito{ display:flex; flex-direction:column; gap:8px; min-height:60px; margin-bottom:14px; }
+.carrito-vacio{ color: var(--madera-suave); text-align:center; padding: 20px 0; font-style:italic; }
+.carrito-item{
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  background:#FBF3E7; border-radius: var(--radio-chico); padding:10px 12px;
+  animation: entrarVista var(--veloz) both;
+}
+.carrito-item .cant-control{ display:flex; align-items:center; gap:6px; }
+.carrito-item .cant-control button{
+  width:26px; height:26px; border-radius:50%; border:1px solid var(--linea); background:#fff; font-weight:800;
+}
+.carrito-total{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 14px 4px; border-top: 2px dashed var(--linea); margin-bottom:14px;
+  font-family: var(--fuente-datos); font-size:1.2rem; font-weight:700;
+}
+
+/* Selector de período (reportes) */
+.selector-periodo{ display:flex; gap:8px; margin-bottom:16px; }
+.chip-periodo{
+  background: var(--fondo-panel); border: 2px solid var(--linea); border-radius:999px;
+  padding: 9px 18px; font-weight:800; font-size:.88rem; color: var(--madera-suave);
+  transition: background var(--veloz), color var(--veloz), border-color var(--veloz);
+  display:inline-flex; align-items:center; gap:7px;
+}
+.chip-periodo.activo{ background: var(--verde-botella); color:#fff; border-color: var(--verde-botella); }
+.chip-periodo:hover:not(.activo){ border-color: var(--ambar); color: var(--ambar-fuerte); }
+
+/* Badges de movimientos de inventario */
+.badge-entrada{ background: var(--verde-suave); color: var(--verde-botella); }
+.badge-salida{ background: var(--ambar-suave); color: var(--ambar-fuerte); }
+.badge-ajuste{ background: var(--vino-suave); color: var(--vino); }
+
+/* Reportes */
+.tabs-reportes{ display:flex; gap:8px; margin-bottom:16px; }
+.tab-reporte{
+  background: var(--fondo-panel); border: 2px solid var(--linea); border-radius:999px;
+  padding: 9px 18px; font-weight:800; color: var(--madera-suave);
+  display:inline-flex; align-items:center; gap:7px;
+}
+.tab-reporte.activo{ background: var(--madera); color:#fff; border-color: var(--madera); }
+.reporte-panel{}
+
+.grafico-barras{ display:flex; align-items:flex-end; gap:14px; height:240px; padding: 10px 4px 0; }
+.barra-col{ flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; height:100%; justify-content:flex-end; }
+.barra{
+  width:100%; max-width:46px; border-radius: 8px 8px 3px 3px;
+  background: linear-gradient(180deg, var(--ambar), var(--ambar-fuerte));
+  transform-origin: bottom; animation: crecer .7s cubic-bezier(.2,.9,.3,1) both;
+}
+.barra.verde{ background: linear-gradient(180deg, var(--verde-botella), #1F3A22); }
+@keyframes crecer{ from{ transform: scaleY(0); } to{ transform: scaleY(1); } }
+.barra-etq{ font-size:.76rem; color: var(--madera-suave); font-weight:700; }
+.barra-valor{ font-family: var(--fuente-datos); font-size:.8rem; font-weight:700; }
+
+.resumen-inventario{ display:grid; grid-template-columns: repeat(3,1fr); gap:16px; }
+.resumen-caja{ background:#FBF3E7; border-radius: var(--radio-chico); padding:18px; text-align:center; }
+.resumen-caja .num-grande{ font-family: var(--fuente-datos); font-size:2rem; font-weight:700; }
+.resumen-caja.ok .num-grande{ color: var(--verde-botella); }
+.resumen-caja.bajo .num-grande{ color: var(--vino); }
+.resumen-caja.agotado .num-grande{ color: var(--madera-suave); }
+
+/* Formularios genéricos dentro de modal */
+.form-vertical{ display:flex; flex-direction:column; gap:14px; }
+.form-fila{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+.texto-ayuda{ color: var(--madera-suave); font-weight:600; font-size:.9rem; margin-bottom:12px; }
+.fila-botones{ display:flex; gap:10px; flex-wrap:wrap; }
+
+/* Modal */
+.modal-fondo{
+  position:fixed; inset:0; background: rgba(43,29,18,.45); backdrop-filter: blur(2px);
+  display:flex; align-items:center; justify-content:center; z-index:500;
+  animation: entrarVista var(--veloz) both;
+  padding: 20px;
+}
+.modal{
+  background: var(--fondo-panel); border-radius: var(--radio);
+  padding: 30px; width: min(560px, 100%); max-height: 88vh; overflow:auto;
+  box-shadow: var(--sombra); position:relative;
+  animation: aparecerLogin var(--medio) both;
+}
+.modal-cerrar{
+  position:absolute; top:16px; right:16px; background: var(--fondo);
+  border:none; width:34px; height:34px; border-radius:50%; font-size:1rem; color: var(--madera-suave);
+}
+.modal-cerrar:hover{ background: var(--vino-suave); color: var(--vino); }
+.modal h3{ font-size:1.3rem; margin-bottom:18px; }
+
+/* =========================================================================
+   RESPONSIVE — el dueño también usa el celular en el mostrador
+   ========================================================================= */
+@media (max-width: 1080px){
+  .fila-dos-columnas{ grid-template-columns: 1fr; }
+  .pos-layout{ grid-template-columns: 1fr; }
+  .tarjetas-kpi{ grid-template-columns: repeat(2,1fr); }
+}
+
+@media (max-width: 760px){
+  .barra-lateral{
+    position:fixed; z-index:400; left:0; top:0; height:100vh;
+    transform: translateX(-100%);
+    box-shadow: var(--sombra);
+  }
+  .barra-lateral.abierta{ transform: translateX(0); }
+  .btn-menu-movil{ display:block; }
+  .contenido{ padding: 18px 16px 90px; }
+  .tarjetas-kpi{ grid-template-columns: 1fr 1fr; gap:10px; }
+  .encabezado-titulo h2{ font-size:1.3rem; }
+  .reloj{ display:none; }
+  .saludo-tarjeta{ flex-direction:column; align-items:flex-start; gap:12px; }
+  .resumen-inventario{ grid-template-columns:1fr; }
+  .form-fila{ grid-template-columns: 1fr; }
+}
+
+/* Overlay para cerrar menú móvil */
+.overlay-menu{
+  position:fixed; inset:0; background: rgba(0,0,0,.35); z-index:390; display:none;
+}
+.overlay-menu.visible{ display:block; }
