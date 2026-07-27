@@ -210,14 +210,17 @@ type CompraNuevaValues = z.infer<typeof compraNuevaSchema>;
  * (con stock 0) — se informa al usuario para que registre la compra
  * manualmente desde la pestaña "Producto existente".
  */
+/**
+ * Producto nuevo + compra en un solo paso: el backend no tiene un
+ * endpoint combinado, así que se compone POST /Producto (crea el
+ * producto con StockActual: 0) seguido de POST /Compra (que suma el
+ * stock comprado). Si el segundo paso falla, el producto ya quedó creado
+ * (con stock 0) — se informa al usuario para que registre la compra
+ * manualmente desde la pestaña "Producto existente".
+ */
 function CompraNuevaForm({ proveedores, categoriasConocidas = [], onGuardado }: CompraFormProps) {
   const { cerrarModal, mostrarToast, mostrarSello } = useApp();
   const [enviando, setEnviando] = useState(false);
-  // El <select> nativo de proveedor (ver JSX abajo) es lo que soluciona el
-  // desplegable que antes no se abría (era un <input list> = datalist).
-  // "proveedorNuevo" alterna a un campo de texto libre para dar de alta un
-  // proveedor que todavía no está en la lista.
-  const [proveedorNuevo, setProveedorNuevo] = useState(false);
 
   const {
     register,
@@ -275,49 +278,18 @@ function CompraNuevaForm({ proveedores, categoriasConocidas = [], onGuardado }: 
     <form id="formCompraNueva" className="form-vertical" onSubmit={handleSubmit(onSubmit)}>
       <label className="campo">
         <span>Proveedor</span>
-        {proveedorNuevo ? (
-          <div className="form-fila" style={{ gridTemplateColumns: "1fr auto" }}>
-            <input
-              type="text"
-              id="ncProveedor"
-              placeholder="Nombre del nuevo proveedor"
-              autoFocus
-              value={nombreProveedorActual}
-              onChange={(e) => setValue("nombreProveedor", e.target.value, { shouldValidate: true })}
-            />
-            <button
-              type="button"
-              className="btn btn-secundario"
-              onClick={() => {
-                setProveedorNuevo(false);
-                setValue("nombreProveedor", proveedores[0]?.nombre || "", { shouldValidate: true });
-              }}
-            >
-              Cancelar
-            </button>
-          </div>
-        ) : (
-          <select
-            id="ncProveedorSelect"
-            value={nombreProveedorActual}
-            onChange={(e) => {
-              if (e.target.value === "__nuevo__") {
-                setProveedorNuevo(true);
-                setValue("nombreProveedor", "", { shouldValidate: true });
-              } else {
-                setValue("nombreProveedor", e.target.value, { shouldValidate: true });
-              }
-            }}
-          >
-            {proveedores.length === 0 && <option value="">No hay proveedores registrados</option>}
-            {proveedores.map((p) => (
-              <option value={p.nombre} key={p.idProveedor}>
-                {p.nombre}
-              </option>
-            ))}
-            <option value="__nuevo__">+ Agregar proveedor nuevo…</option>
-          </select>
-        )}
+        <select
+          id="ncProveedorSelect"
+          value={nombreProveedorActual}
+          onChange={(e) => setValue("nombreProveedor", e.target.value, { shouldValidate: true })}
+        >
+          {proveedores.length === 0 && <option value="">No hay proveedores registrados</option>}
+          {proveedores.map((p) => (
+            <option value={p.nombre} key={p.idProveedor}>
+              {p.nombre}
+            </option>
+          ))}
+        </select>
       </label>
       <label className="campo">
         <span>Nombre del producto</span>
