@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useApp } from "../context/AppContext";
 import { extraerMensajeError } from "../lib/apiClient";
+import { Icon } from "../lib/icons";
 import { usuarioService } from "../services/usuarioService";
 
 const schema = z
@@ -21,6 +22,9 @@ type FormValues = z.infer<typeof schema>;
 export function CambioPasswordForm() {
   const { sesion, mostrarToast, mostrarSello } = useApp();
   const [enviando, setEnviando] = useState(false);
+  const [mostrarPasswordActual, setMostrarPasswordActual] = useState(false);
+  const [mostrarPasswordNueva, setMostrarPasswordNueva] = useState(false);
+  const [mostrarPasswordConfirmar, setMostrarPasswordConfirmar] = useState(false);
   const {
     register,
     handleSubmit,
@@ -54,15 +58,45 @@ export function CambioPasswordForm() {
     <form id="formCambioPassword" className="form-vertical" onSubmit={handleSubmit(onSubmit)}>
       <label className="campo">
         <span>Contraseña actual</span>
-        <input type="password" id="passwordActual" {...register("actual")} />
+        <div className="campo-password">
+          <input type={mostrarPasswordActual ? "text" : "password"} id="passwordActual" {...register("actual")} />
+          <button
+            type="button"
+            className="btn-ojo"
+            aria-label={mostrarPasswordActual ? "Ocultar contraseña" : "Mostrar contraseña"}
+            onClick={() => setMostrarPasswordActual((v) => !v)}
+          >
+            <Icon name={mostrarPasswordActual ? "ojoCerrado" : "ojo"} size={18} />
+          </button>
+        </div>
       </label>
       <label className="campo">
         <span>Nueva contraseña</span>
-        <input type="password" id="passwordNueva" minLength={6} {...register("nueva")} />
+        <div className="campo-password">
+          <input type={mostrarPasswordNueva ? "text" : "password"} id="passwordNueva" minLength={6} {...register("nueva")} />
+          <button
+            type="button"
+            className="btn-ojo"
+            aria-label={mostrarPasswordNueva ? "Ocultar contraseña" : "Mostrar contraseña"}
+            onClick={() => setMostrarPasswordNueva((v) => !v)}
+          >
+            <Icon name={mostrarPasswordNueva ? "ojoCerrado" : "ojo"} size={18} />
+          </button>
+        </div>
       </label>
       <label className="campo">
         <span>Confirmar nueva contraseña</span>
-        <input type="password" id="passwordConfirmar" minLength={6} {...register("confirmar")} />
+        <div className="campo-password">
+          <input type={mostrarPasswordConfirmar ? "text" : "password"} id="passwordConfirmar" minLength={6} {...register("confirmar")} />
+          <button
+            type="button"
+            className="btn-ojo"
+            aria-label={mostrarPasswordConfirmar ? "Ocultar contraseña" : "Mostrar contraseña"}
+            onClick={() => setMostrarPasswordConfirmar((v) => !v)}
+          >
+            <Icon name={mostrarPasswordConfirmar ? "ojoCerrado" : "ojo"} size={18} />
+          </button>
+        </div>
       </label>
       {Object.values(errors)[0]?.message && (
         <p className="login-error visible">{Object.values(errors)[0]?.message as string}</p>
