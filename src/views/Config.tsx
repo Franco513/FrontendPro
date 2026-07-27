@@ -1,5 +1,4 @@
 import { CambioPasswordForm } from "../forms/CambioPasswordForm";
-import { AgregarUsuarioForm } from "../forms/AgregarUsuarioForm";
 import { fechaLegible } from "../lib/format";
 import { useApiResource } from "../lib/useAsync";
 import { auditoriaService } from "../services/auditoriaService";
@@ -12,13 +11,6 @@ export function Config() {
           <h4>Cambiar contraseña</h4>
         </div>
         <CambioPasswordForm />
-      </div>
-
-      <div className="panel panel-angosto">
-        <div className="panel-encabezado">
-          <h4>Agregar usuario</h4>
-        </div>
-        <AgregarUsuarioForm />
       </div>
 
       <AuditoriaPanel />
