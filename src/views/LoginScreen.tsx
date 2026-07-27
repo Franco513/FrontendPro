@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -24,7 +25,7 @@ export function LoginScreen() {
 
 function FormularioLogin({ onIrAPrimerUsuario }: { onIrAPrimerUsuario: () => void }) {
   const { iniciarSesion, cargandoLogin, mostrarToast } = useApp();
-  const [mostrarPassword, setMostrarPassword] = useState(false);
+  const [mostrarPasswordLogin, setMostrarPasswordLogin] = useState(false);
   const [errorLogin, setErrorLogin] = useState("");
   const [sacudir, setSacudir] = useState(false);
 
@@ -90,7 +91,7 @@ function FormularioLogin({ onIrAPrimerUsuario }: { onIrAPrimerUsuario: () => voi
             <span>Contraseña</span>
             <div className="campo-password">
               <input
-                type={mostrarPassword ? "text" : "password"}
+                type={mostrarPasswordLogin ? "text" : "password"}
                 id="loginPassword"
                 placeholder="••••••••"
                 autoComplete="current-password"
@@ -101,10 +102,10 @@ function FormularioLogin({ onIrAPrimerUsuario }: { onIrAPrimerUsuario: () => voi
                 type="button"
                 className="btn-ojo"
                 id="btnOjo"
-                aria-label="Mostrar contraseña"
-                onClick={() => setMostrarPassword((v) => !v)}
+                aria-label={mostrarPasswordLogin ? "Ocultar contraseña" : "Mostrar contraseña"}
+                onClick={() => setMostrarPasswordLogin((v) => !v)}
               >
-                <Icon name={mostrarPassword ? "ojoCerrado" : "ojo"} size={18} />
+                <Icon name={mostrarPasswordLogin ? "ojoCerrado" : "ojo"} size={18} />
               </button>
             </div>
           </label>
@@ -132,11 +133,17 @@ function FormularioLogin({ onIrAPrimerUsuario }: { onIrAPrimerUsuario: () => voi
   );
 }
 
-const primerUsuarioSchema = z.object({
-  nombre: z.string().min(1, "Ingresa tu nombre"),
-  usuarioLogin: z.string().min(1, "Elige un usuario"),
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
-});
+const primerUsuarioSchema = z
+  .object({
+    nombre: z.string().min(1, "Ingresa tu nombre"),
+    usuarioLogin: z.string().min(1, "Elige un usuario"),
+    password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+    confirmPassword: z.string().min(6, "Confirma la contraseña"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"],
+  });
 type PrimerUsuarioForm = z.infer<typeof primerUsuarioSchema>;
 
 /**
@@ -148,11 +155,16 @@ type PrimerUsuarioForm = z.infer<typeof primerUsuarioSchema>;
  * recién creada.
  */
 function PrimerUsuarioScreen({ onVolver }: { onVolver: () => void }) {
+  const navigate = useNavigate();
+  const { iniciarSesion, mostrarToast, cargandoLogin } = useApp();
   const [enviando, setEnviando] = useState(false);
+  const [mostrarPasswordRegistro, setMostrarPasswordRegistro] = useState(false);
+  const [mostrarConfirmPasswordRegistro, setMostrarConfirmPasswordRegistro] = useState(false);
   const [mensaje, setMensaje] = useState<{ texto: string; tipo: "exito" | "error" } | null>(null);
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<PrimerUsuarioForm>({ resolver: zodResolver(primerUsuarioSchema) });
 
@@ -160,8 +172,21 @@ function PrimerUsuarioScreen({ onVolver }: { onVolver: () => void }) {
     setEnviando(true);
     setMensaje(null);
     try {
-      await usuarioService.crearPrimerUsuario(datos);
-      setMensaje({ texto: "Usuario administrador creado. Ya puedes iniciar sesión.", tipo: "exito" });
+      await usuarioService.crearPrimerUsuario({
+        nombre: datos.nombre,
+        usuarioLogin: datos.usuarioLogin,
+        password: datos.password,
+      });
+
+      const resultado = await iniciarSesion(datos.usuarioLogin, datos.password);
+      if (!resultado.ok) {
+        setMensaje({ texto: resultado.error || "No se pudo iniciar sesión automáticamente.", tipo: "error" });
+        return;
+      }
+
+      reset();
+      mostrarToast(`¡Bienvenido, ${datos.nombre}! El sistema está listo para operar.`, "exito");
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       setMensaje({ texto: extraerMensajeError(err), tipo: "error" });
     } finally {
@@ -194,16 +219,47 @@ function PrimerUsuarioScreen({ onVolver }: { onVolver: () => void }) {
           </label>
           <label className="campo">
             <span>Contraseña</span>
-            <input type="password" autoComplete="new-password" {...register("password")} />
+            <div className="campo-password">
+              <input
+                type={mostrarPasswordRegistro ? "text" : "password"}
+                autoComplete="new-password"
+                {...register("password")}
+              />
+              <button
+                type="button"
+                className="btn-ojo"
+                aria-label={mostrarPasswordRegistro ? "Ocultar contraseña" : "Mostrar contraseña"}
+                onClick={() => setMostrarPasswordRegistro((v) => !v)}
+              >
+                <Icon name={mostrarPasswordRegistro ? "ojoCerrado" : "ojo"} size={18} />
+              </button>
+            </div>
+          </label>
+          <label className="campo">
+            <span>Confirmar contraseña</span>
+            <div className="campo-password">
+              <input
+                type={mostrarConfirmPasswordRegistro ? "text" : "password"}
+                autoComplete="new-password"
+                {...register("confirmPassword")}
+              />
+              <button
+                type="button"
+                className="btn-ojo"
+                aria-label={mostrarConfirmPasswordRegistro ? "Ocultar contraseña" : "Mostrar contraseña"}
+                onClick={() => setMostrarConfirmPasswordRegistro((v) => !v)}
+              >
+                <Icon name={mostrarConfirmPasswordRegistro ? "ojoCerrado" : "ojo"} size={18} />
+              </button>
+            </div>
           </label>
           <p
-            className={"login-error" + (mensaje || errors.nombre || errors.usuarioLogin || errors.password ? " visible" : "")}
-            style={mensaje?.tipo === "exito" ? { color: "var(--verde-botella)" } : undefined}
+            className={"login-error" + (mensaje || errors.nombre || errors.usuarioLogin || errors.password || errors.confirmPassword ? " visible" : "")}
           >
-            {mensaje?.texto || errors.nombre?.message || errors.usuarioLogin?.message || errors.password?.message || ""}
+            {mensaje?.texto || errors.nombre?.message || errors.usuarioLogin?.message || errors.password?.message || errors.confirmPassword?.message || ""}
           </p>
-          <button type="submit" className="btn btn-primario btn-ancho" disabled={enviando}>
-            {enviando ? "Creando…" : "Crear usuario administrador"}
+          <button type="submit" className="btn btn-primario btn-ancho" disabled={enviando || cargandoLogin}>
+            {enviando || cargandoLogin ? "Creando…" : "Crear usuario administrador"}
           </button>
         </form>
         <button
