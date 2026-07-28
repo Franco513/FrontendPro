@@ -165,6 +165,7 @@ input, select{ font-family: inherit; }
 .btn-ojo{
   position:absolute; right:10px; top:50%; transform:translateY(-50%);
   background:none; border:none; font-size:1.1rem; opacity:.6;
+  display: inline-flex; align-items: center; justify-content: center; padding: 0;
 }
 .btn-ojo:hover{ opacity:1; }
 
@@ -468,6 +469,8 @@ input, select{ font-family: inherit; }
 .tabla tbody tr{ transition: background var(--veloz); }
 .tabla tbody tr:hover{ background: #FBF3E7; }
 .tabla .num{ font-family: var(--fuente-datos); }
+.fila-clicable{ cursor: pointer; }
+.fila-clicable:hover{ background: var(--ambar-suave) !important; }
 
 .badge{ padding:4px 10px; border-radius:999px; font-weight:800; font-size:.76rem; }
 .badge-ok{ background: var(--verde-suave); color: var(--verde-botella); }
@@ -476,6 +479,7 @@ input, select{ font-family: inherit; }
 
 .icono-accion{
   background:none; border:none; font-size:1rem; padding:6px; border-radius:8px;
+  display: inline-flex; align-items: center; justify-content: center;
   transition: background var(--veloz), transform var(--veloz);
 }
 .icono-accion:hover{ background: var(--ambar-suave); transform: scale(1.1); }
@@ -519,6 +523,7 @@ input, select{ font-family: inherit; }
 .carrito-item .cant-control{ display:flex; align-items:center; gap:6px; }
 .carrito-item .cant-control button{
   width:26px; height:26px; border-radius:50%; border:1px solid var(--linea); background:#fff; font-weight:800;
+  display: inline-flex; align-items: center; justify-content: center; padding: 0; line-height: 1;
 }
 .carrito-total{
   display:flex; align-items:center; justify-content:space-between;
@@ -591,10 +596,14 @@ input, select{ font-family: inherit; }
   animation: aparecerLogin var(--medio) both;
 }
 .modal-cerrar{
-  position:absolute; top:16px; right:16px; background: var(--fondo);
-  border:none; width:34px; height:34px; border-radius:50%; font-size:1rem; color: var(--madera-suave);
+  position:absolute; top:16px; right:16px;
+  background: var(--vino-suave); color: var(--vino);
+  border:none; width:34px; height:34px; border-radius:50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0; margin: 0; cursor: pointer;
+  transition: background var(--veloz), color var(--veloz), transform var(--veloz);
 }
-.modal-cerrar:hover{ background: var(--vino-suave); color: var(--vino); }
+.modal-cerrar:hover{ background: var(--vino); color: #fff; transform: scale(1.08); }
 .modal h3{ font-size:1.3rem; margin-bottom:18px; }
 
 /* =========================================================================
